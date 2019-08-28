@@ -2,15 +2,18 @@
   <div id="app">
     <div class="header"><div class="headerInner">
       <h1 class="headerL">再翻やくん</h1>
-      <input class="headerR" type="button" value="閉じる" id="closeB"
-            onclick="closeWindow()">
-      <input class="headerR" type="button" value="★List" id="tofavorite"
-            onclick="switchSection('favorite')">
-      <input class="headerR" type="button" value="TOP" id="tomain"
-            onclick="switchSection('main')">
+      <input class="headerR" type="button" value="★List"
+             @click="showFavo()" v-if="showsMain">
+      <input class="headerR" type="button" value="TOP"
+             @click="showMain()" v-if="showsFavo"> 
     </div></div><br>
-    <Main/>
-    <Favo/>
+    <div v-if="showsMain">
+      <Main v-bind:initInput="initialInput" v-bind:initFromLang="initialLang"/>
+    </div>
+    
+    <div v-if="showsFavo">
+      <Favo @inputFromFavo="inputFromFavo"/>
+    </div>
   </div>
 </template>
 
@@ -23,7 +26,33 @@ export default {
   components: {
     Favo,
     Main
+  },
+  data () {
+    return {
+      showsMain : true,
+      showsFavo : false,
+      initialInput : "",
+      initialLang  : "ja"
+    }
+  },
+  methods: {
+    showMain: function(){
+      this.showsMain = true;
+      this.showsFavo = false;
+    },
+    showFavo: function(){
+      this.showsMain = false;
+      this.showsFavo = true;
+    },
+    inputFromFavo: function(favo) {
+      console.log(favo.sentence);
+      console.log(favo.lang);
+      this.initialInput = favo.sentence;
+      this.initialLang  = favo.lang;
+      this.showMain();
+    },
   }
+
 }
 </script>
 
@@ -39,9 +68,9 @@ export default {
   }
   .header{
     position: fixed;
-    top:0;
-    right: 0;
-    left:0;
+    top   : 0;
+    right : 0;
+    left  : 0;
     background: #EEE;
     color: #000;
     height:4em;
@@ -56,10 +85,10 @@ export default {
     float:right;
     margin-top:1rem;
     height:2rem !important;
+    width :4em;
   }
   .headerL{
     float: left;
-    margin-left:1em;
   }
   .header::after {
     content: "";
@@ -89,7 +118,7 @@ export default {
     display:inline-block;
   }
   h2{
-    margin: .5em 0 .5em 0;
+    margin: .5em .5em .5em 0;
     padding:0;
     font-size:1.2em;
     display:inline-block;
@@ -104,7 +133,7 @@ export default {
   #recButton,#repRecButton{
     width:7.5em;
     max-width:90%;
-    display:none;
+    /* display:none; */
   }
   textarea{
     font-family: 'Sawarabi Mincho','Noto Serif JP', sans-serif;
@@ -153,12 +182,10 @@ export default {
     background: #F40 !important;
     color: #FFF;
   }
-  #tomain,#tofavorite{
-    width: 4.2em;
-    padding: 0;
-    /* display: none; */
-  }
-  #closeB,#TTSSButton{
+  #tofavorite{
     display: none;
   }
+  /* #TTSSButton{
+    display: none;
+  } */
 </style>

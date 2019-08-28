@@ -1,46 +1,37 @@
 <template>
-  <div class="favo">
+
+  <div class="favo-component">
+
+    <p v-if="FavoData.length==0">
+      お気に入りは登録されていません．<br>
+      ★ボタンで登録するとここに表示されます．
+    </p>
     <ul>
-      <li v-for="favo in FavoData" :key="favo">
+      <li v-for="favo in FavoData">
         <input value="←" type="button" class="radius50"
                v-on:click="writeInput(favo)">
         <input value="✖"  type="button" class="radius50"
                v-on:click="deleteFavorite(favo.sentence)">
         {{ favo.lang }}:{{ favo.sentence }}        
       </li>
-    </ul>     
+    </ul>
   </div>
 </template>
 
 <script>
 export default {
-  name: 'favo',
+  name: 'favo-component',
   data () {
     return {
-      FavoData: [
-        {lang:"en",
-        sentence:"I have a pen."},
-        {lang:"en",
-        sentence:"I have an apple."}
-      ]
+      FavoData: []
     }
   },
   props: {
     msg: String
   },
   methods: {
-    addFavorite: function(newLang,newSentence){
-      if(!newSentence){
-        alert("何も入力されていません\n");
-        return -1;  
-      }
-      alert("お気に入り登録しました\n"+newSentence);
-      this.deleteFavorite(newSentence); // 被りは消す
-      this.FavoData.unshift({
-        lang:     newLang,
-        sentence: newSentence,
-      });
-      this.saveFavorite();
+    emitEventTwo () {
+      this.$emit('inputFromFavo', 'This is an argument')
     },
     deleteFavorite: function(sentence){
       this.FavoData = this.FavoData.filter(function (item) {
@@ -58,22 +49,18 @@ export default {
       }
     },
     writeInput: function(favo){
-      clearTextareas();
-      ElmId("fromLang").value = favo.lang;
-      ElmId("input").value    = favo.sentence;
-      execTrans();
-      switchSection("main");
+      this.$emit('inputFromFavo', favo);
     }
-  }/*,
-  mounted: function(){
+  },
+  created: function(){
     this.loadFavorite();
-  }*/
+  }
 }
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-.favo{
-  margin-top: 2.5em;
+.favo-component{
+  margin-top: 4em;
 }
 </style>
