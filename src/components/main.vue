@@ -1,11 +1,13 @@
 <template>
   <div class="main-component">
     <h2>入力</h2>
-    <select v-model="fromLang">
-      <option v-for="lang in langs" v-bind:value="lang.code" v-bind:key="lang.code">
+    <select v-model="fromLang" v-on:click="showLangButton();">
+      <option v-for="lang in langs" v-bind:value="lang.code" 
+              v-on:change="translate();" v-bind:key="lang.code">
         {{ lang.char }}
       </option>
     </select>
+
     <input type="button" v-on:click="voiceInput();" class="voiceInputButton" 
            v-model="voiceInputButtonMsg"> 
     <input type="button" v-on:click="translate();" value="翻訳">
@@ -14,17 +16,19 @@
     <textarea id="input" v-model="input"></textarea>
     <h2>翻訳結果</h2>
     <select v-model="toLang">
-      <option v-for="lang in langs" v-bind:value="lang.code" v-bind:key="lang.code">
+      
+      <option v-for="lang in langs" v-bind:value="lang.code" 
+              v-on:change="translate();" v-bind:key="lang.code">
         {{ lang.char }}
       </option>
     </select>
     <input type="button" v-on:click="swapTexts();" value="▲">
     <input type="button" v-on:click="speak();"   value="読">
-    <!-- <input type="button" id="repRecButton" value="返答音声入力" onclick="replyMicRecStart()"> -->
+    <input type="button" value="返答音声入力" v-on:click="replyByVoice();">
     <textarea v-model="translated" readonly></textarea>
     
     <h2>再翻訳結果</h2>
-    <!-- <input type="button" onclick="tweet();" value="Tweet"> -->
+    <input type="button" v-on:click="tweet();" value="Tweet">
     <textarea v-model="retranslated" readonly></textarea>
   </div>
 </template>
@@ -49,12 +53,12 @@ export default {
       toLang      : "en",
       translated  : "",
       retranslated: "",
-      isWaiting   : false,
       lastInput   : "hoge",
       // transCnt    : 0,
       FavoData    : [],
       voiceInputButtonMsg : "音声入力",
-      speaks      : false
+      speaks      : false,
+      showsLangButton: false
     }
   },
   props: {
@@ -62,6 +66,9 @@ export default {
     initFromLang: String,
   },
   methods: {
+    showLangButton: function(){
+      this.showsLangButton = true;
+    },
     translate: function(){
       // 同じ言語には翻訳できない
       if(this.fromLang == this.toLang){
@@ -69,7 +76,7 @@ export default {
         else                   this.toLang = "ja";
       } 
       // inputに変更がなければ早期リターン
-      let thisInput = this.fromLang + this.input;
+      let thisInput = this.fromLang + this.toLang + this.input;
       if(thisInput == this.lastInput){
         return 0;
       } 
@@ -88,14 +95,9 @@ export default {
       };
     },
     showTranslateResult: function(data){
-      // console.log(data);
       this.translated   = data.translatedText;
       this.retranslated = data.retranslatedText;
-      // console.log(this.input);
-      if(this.isWaiting){
-        this.translate();
-      }
-      this.isWaiting = false;
+      if(this.speaks)this.speak();
     },
     autoTrans: function(){
       setInterval(()=>{this.translate()},1000);
@@ -150,6 +152,10 @@ export default {
         alert("このブラウザは音声認識に非対応です．Web Speech API をサポートするブラウザをご利用ください．" + e);
       }
     },
+    replyByVoice: function(){
+      this.swapTexts();
+      this.voiceInput();
+    },
     speak: function(){
       try{
         this.speaks = false;
@@ -191,12 +197,33 @@ export default {
     },
     saveFavorite: function(){
       localStorage.setItem('FavoData', JSON.stringify(this.FavoData));
-    }
+    },tweet(){
+      if(this.input==""){
+          alert("何も入力されていません");
+          return -1;
+      }
+      let url = "https://itanium-r.github.io/retranser/index.html";
+      // url += "?fromLang=" + ElmId("fromLang").value;
+      // url += "&toLang="   + ElmId("toLang").value;
+      // url += "&input="    + encodeURIComponent(ElmId("input").value);
+      // url = encodeURIComponent(url);
+      let message = this.retranslated;
+      message += "←";
+      message += this.translated;
+      message += "←";
+      message += this.input;
+      message += encodeURIComponent( " #再翻やくん" ); 
+
+      document.open("https://twitter.com/share?url=" + url + 
+                    "&text=" + message + "&count=none&lang=ja",
+                    "_blank",
+                    "toolbar=no,location=no,menubar=no,status=no");
+      }
   },created: function(){
     // 自動翻訳
     setInterval(()=>{this.translate()},1000);
-    this.input    = this.initInput;
-    this.fromLang = this.initFromLang;
+    if(this.initInput)this.input    = this.initInput;
+    if(this.initFromLang)this.fromLang = this.initFromLang;
     if(this.input)this.translate();
   }
 }
@@ -208,20 +235,30 @@ export default {
     margin-top: 2.5em;
   }
   input[type="button"].voiceInputButton{
-    width:8em !important;
+    width: 8em !important;
   }
   textarea{
     font-family: 'Sawarabi Mincho','Noto Serif JP', sans-serif;
     resize: none;
     width : 24rem;
     height: 6em;
-    max-width:100%;
-    border:solid 1px #AAA;
+    max-width: 100%;
+    border: solid 1px #AAA;
     border-radius: .5em;
-    font-size:1.2em;
-    -ms-overflow-style:none;
+    font-size: 1.2em;
+    -ms-overflow-style: none;
   }
   textarea::-webkit-scrollbar{
     display:none;
+  }
+  button{
+    font-size: 2rem;
+    width:     5rem;
+    height:    5rem;
+    display: inline-block;
+    border-radius: 50%;
+    background: #EFEFEF;
+    border: solid 1px #AAA;
+    z-index: 9;
   }
 </style>

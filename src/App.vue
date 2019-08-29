@@ -1,17 +1,18 @@
 <template>
   <div id="app">
-    <div class="header"><div class="headerInner">
+    <div class="header fadeWhenChange"><div class="headerInner">
       <h1 class="headerL">再翻やくん</h1>
       <input class="headerR" type="button" value="★List"
              @click="showFavo()" v-if="showsMain">
       <input class="headerR" type="button" value="TOP"
              @click="showMain()" v-if="showsFavo"> 
     </div></div><br>
-    <div v-if="showsMain">
+    
+    <div v-if="showsMain" class="fadeWhenChange">
       <Main v-bind:initInput="initialInput" v-bind:initFromLang="initialLang"/>
     </div>
     
-    <div v-if="showsFavo">
+    <div v-if="showsFavo" class="fadeWhenChange">
       <Favo @inputFromFavo="inputFromFavo"/>
     </div>
   </div>
@@ -37,16 +38,14 @@ export default {
   },
   methods: {
     showMain: function(){
-      this.showsMain = true;
       this.showsFavo = false;
+      this.showsMain = true;
     },
     showFavo: function(){
       this.showsMain = false;
       this.showsFavo = true;
     },
     inputFromFavo: function(favo) {
-      // console.log(favo.sentence);
-      // console.log(favo.lang);
       this.initialInput = favo.sentence;
       this.initialLang  = favo.lang;
       this.showMain();
@@ -83,7 +82,7 @@ export default {
   }
   .headerR{
     float:right;
-    margin-top:1rem;
+    margin-top:1rem !important;
     height:2rem !important;
     width :4em;
   }
@@ -97,13 +96,7 @@ export default {
     overflow: hidden;
   }
   
-  #main{
-    display: none;
-    animation:         fadeIn .5s ease 0s 1 normal forwards;
-    -webkit-animation: fadeIn .5s ease 0s 1 normal forwards;
-  }
-  #favorite{
-    display: none;
+  .fadeWhenChange{
     animation:         fadeIn .5s ease 0s 1 normal forwards;
     -webkit-animation: fadeIn .5s ease 0s 1 normal forwards;
   }
@@ -129,34 +122,7 @@ export default {
     border:solid 1px #AAA;
     border-radius: .2em;
     height:2.4em;
-  }
-  #recButton,#repRecButton{
-    width:7.5em;
-    max-width:90%;
-    /* display:none; */
-  }
-  textarea{
-    font-family: 'Sawarabi Mincho','Noto Serif JP', sans-serif;
-    resize: none;
-    width : 24rem;
-    height: 6em;
-    max-width:100%;
-    border:solid 1px #AAA;
-    border-radius: .5em;
-    font-size:1.2em;
-    -ms-overflow-style:none;
-  }
-  textarea::-webkit-scrollbar{
-    display:none;
-  }
-  div.tArea{
-    width : 24em;
-    max-width:90%;
-    height: 6em;
-    
-    background:#FFF;
-    border:solid 1px #AAA;
-    border-radius: .5em;
+    margin: .1em;
   }
   #app{
     margin:auto;
@@ -185,7 +151,4 @@ export default {
   #tofavorite{
     display: none;
   }
-  /* #TTSSButton{
-    display: none;
-  } */
 </style>
