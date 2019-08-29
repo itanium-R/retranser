@@ -7,7 +7,7 @@
       ★ボタンで登録するとここに表示されます．
     </p>
     <ul>
-      <li v-for="favo in FavoData">
+      <li v-for="favo in FavoData" v-bind:key="favo.sentence">
         <input value="←" type="button" class="radius50"
                v-on:click="writeInput(favo)">
         <input value="✖"  type="button" class="radius50"

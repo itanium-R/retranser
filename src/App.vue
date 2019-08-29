@@ -45,8 +45,8 @@ export default {
       this.showsFavo = true;
     },
     inputFromFavo: function(favo) {
-      console.log(favo.sentence);
-      console.log(favo.lang);
+      // console.log(favo.sentence);
+      // console.log(favo.lang);
       this.initialInput = favo.sentence;
       this.initialLang  = favo.lang;
       this.showMain();
