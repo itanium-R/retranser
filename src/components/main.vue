@@ -1,7 +1,8 @@
 <template>
   <div class="main-component">
     <h2>入力</h2>
-    <select v-model="fromLang" v-on:click="showLangButton();">
+    <select v-model="fromLang" v-on:click="showLangButton('入力');" 
+                               v-on:blur="hideLangButton();">
       <option v-for="lang in langs" v-bind:value="lang.code" 
               v-on:change="translate();" v-bind:key="lang.code">
         {{ lang.char }}
@@ -15,8 +16,8 @@
     <input type="button" v-on:click="clearTexts();" value="消">
     <textarea id="input" v-model="input"></textarea>
     <h2>翻訳結果</h2>
-    <select v-model="toLang">
-      
+    <select v-model="toLang" v-on:click="showLangButton('翻訳先');"
+                             v-on:blur="hideLangButton();">
       <option v-for="lang in langs" v-bind:value="lang.code" 
               v-on:change="translate();" v-bind:key="lang.code">
         {{ lang.char }}
@@ -30,7 +31,17 @@
     <h2>再翻訳結果</h2>
     <input type="button" v-on:click="tweet();" value="Tweet">
     <textarea v-model="retranslated" readonly></textarea>
+  
+    <div v-if="showsLangButton" class="langSelector">
+    <div class="center">
+      <h2>{{ langButtonMode }}言語を選択してください．</h2>
+      <span v-for="lang in langs" v-bind:value="lang.code"
+            v-on:change="translate();" v-bind:key="lang.code">
+        <button v-on:click="setLang(lang.code)">{{lang.description}}</button>
+      </span>
+    </div></div>
   </div>
+  
 </template>
 
 <script>
@@ -40,13 +51,17 @@ export default {
     return {
       langs: [
         {code: "en",
-         char: "英"},
+         char: "英",
+         description: "English"},
         {code: "ja",
-         char: "日"},
+         char: "日",
+         description: "日本語"},
         {code: "zh",
-         char: "中"},
+         char: "中",
+         description: "中文"},
         {code: "ko",
-         char: "韓"},
+         char: "韓",
+         description: "한국어"},
       ],
       input   : "",
       fromLang: "",
@@ -58,7 +73,8 @@ export default {
       FavoData    : [],
       voiceInputButtonMsg : "音声入力",
       speaks      : false,
-      showsLangButton: false
+      showsLangButton: false,
+      langButtonMode : ""
     }
   },
   props: {
@@ -66,8 +82,25 @@ export default {
     initFromLang: String,
   },
   methods: {
-    showLangButton: function(){
-      this.showsLangButton = true;
+    showLangButton: function(mode){
+      setTimeout(() => {
+        this.showsLangButton = true;
+        this.langButtonMode  = mode;
+      },250);
+    },
+    hideLangButton: function(){
+      setTimeout(() => {
+        this.showsLangButton = false},
+      200);
+    },
+    setLang: function(lang){
+      if(this.langButtonMode == "入力"){
+        this.fromLang = lang;
+      }
+      if(this.langButtonMode == "翻訳先"){
+        this.toLang   = lang;
+      }
+      this.showsLangButton = false;
     },
     translate: function(){
       // 同じ言語には翻訳できない
@@ -121,8 +154,8 @@ export default {
       this.translate();
     },
     voiceInput: function(){
-      try{
-        var recognition = new webkitSpeechRecognition() || 
+      try{                                                 // eslint-disable-next-line
+        var recognition = new webkitSpeechRecognition() || // eslint-disable-next-line
                           new SpeechRecognition();
         recognition.onresult = (event) => {
           if(event.results.length > 0){
@@ -235,7 +268,7 @@ export default {
     margin-top: 2.5em;
   }
   input[type="button"].voiceInputButton{
-    width: 8em !important;
+    width: 7em !important;
   }
   textarea{
     font-family: 'Sawarabi Mincho','Noto Serif JP', sans-serif;
@@ -251,14 +284,29 @@ export default {
   textarea::-webkit-scrollbar{
     display:none;
   }
+  .langSelector{
+    z-index: 9;
+    background: #EEE;
+    position: fixed;
+    padding: 1em;
+    bottom:0;
+    right: 0;
+    left: 0;
+    margin: 0;
+  }
+  .center{
+    width: 12em;
+    margin: auto;
+  }
+  
   button{
-    font-size: 2rem;
+    font-size: 1.2rem;
     width:     5rem;
     height:    5rem;
+    margin:   .5rem;
     display: inline-block;
     border-radius: 50%;
-    background: #EFEFEF;
+    background: #FFF;
     border: solid 1px #AAA;
-    z-index: 9;
   }
 </style>

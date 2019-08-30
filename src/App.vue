@@ -8,7 +8,7 @@
              @click="showMain()" v-if="showsFavo"> 
     </div></div><br>
     
-    <div v-if="showsMain" class="fadeWhenChange">
+    <div v-if="showsMain"  class="fadeWhenChange">
       <Main v-bind:initInput="initialInput" v-bind:initFromLang="initialLang"/>
     </div>
     
@@ -33,13 +33,13 @@ export default {
       showsMain : true,
       showsFavo : false,
       initialInput : "",
-      initialLang  : "ja"
+      initialLang  : "ja",
     }
   },
   methods: {
     showMain: function(){
       this.showsFavo = false;
-      this.showsMain = true;
+      setTimeout(()=>{this.showsMain = true},100);
     },
     showFavo: function(){
       this.showsMain = false;
@@ -97,8 +97,8 @@ export default {
   }
   
   .fadeWhenChange{
-    animation:         fadeIn .5s ease 0s 1 normal forwards;
-    -webkit-animation: fadeIn .5s ease 0s 1 normal forwards;
+    animation:         fadeIn 1.5s ease 0s 1 normal forwards;
+    -webkit-animation: fadeIn 1.5s ease 0s 1 normal forwards;
   }
   @keyframes fadeIn {
     0% {opacity: 0}
